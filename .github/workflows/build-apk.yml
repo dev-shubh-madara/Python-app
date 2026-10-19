@@ -1,0 +1,92 @@
+name: Build APK
+
+# Builds the Android APK on GitHub's servers every time you push to main
+# (or when you press "Run workflow" on the Actions tab).
+# The APK is attached to a GitHub Release and also uploaded as a build artifact.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the web app (editor + bundled Python)
+        run: npm run build
+
+      - name: Create the Android project
+        run: |
+          npx cap add android
+          # App icon
+          cp -r resources/android/res/* android/app/src/main/res/
+          # Version number = build number, so each new APK installs as an update
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]+\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          # Keep the screen usable when the keyboard opens
+          sed -i 's/android:launchMode="singleTask"/android:launchMode="singleTask" android:windowSoftInputMode="adjustResize"/' android/app/src/main/AndroidManifest.xml
+          npx cap sync android
+
+      - name: Use the project's fixed signing key
+        run: |
+          mkdir -p ~/.android
+          cp android-signing/debug.keystore ~/.android/debug.keystore
+
+      - name: Build APK with Gradle
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk "dist/MadaraPyIDE-v1.0.${{ github.run_number }}.apk"
+          ls -lh dist
+
+      - name: Upload APK (Actions artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: MadaraPyIDE-apk
+          path: dist/*.apk
+          retention-days: 30
+
+      - name: Publish GitHub Release with the APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Madara PyIDE v1.0.${{ github.run_number }}
+          body: |
+            📱 **Install:** download `MadaraPyIDE-v1.0.${{ github.run_number }}.apk` below on your Android phone, open it, and allow "Install unknown apps" if asked.
+
+            Built from commit ${{ github.sha }}.
+          files: dist/*.apk
+          make_latest: true

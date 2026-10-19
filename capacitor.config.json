@@ -1,0 +1,17 @@
+{
+  "appId": "com.madara.pyide",
+  "appName": "Madara PyIDE",
+  "webDir": "www",
+  "backgroundColor": "#0b1020",
+  "android": {
+    "backgroundColor": "#0b1020",
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native"
+    }
+  }
+}

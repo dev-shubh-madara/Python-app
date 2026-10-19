@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>Madara PyIDE</title>
+    <link rel="icon" href="./icon.svg" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Top bar -->
+      <header id="topbar">
+        <button class="icon-btn" id="btn-sidebar" title="Explorer" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+        </button>
+        <div id="brand"><span class="logo">⟁</span><span class="brand-text">Madara <b>PyIDE</b></span></div>
+        <div id="title-file"></div>
+        <div class="spacer"></div>
+        <button class="icon-btn" id="btn-undo" title="Undo" aria-label="Undo">
+          <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" /></svg>
+        </button>
+        <button class="icon-btn" id="btn-redo" title="Redo" aria-label="Redo">
+          <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" /></svg>
+        </button>
+        <button id="btn-run" title="Run (Ctrl+Enter)" aria-label="Run">
+          <svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" /></svg><span>Run</span>
+        </button>
+        <button id="btn-stop" title="Stop" aria-label="Stop" hidden>
+          <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5" /></svg><span>Stop</span>
+        </button>
+        <button class="icon-btn" id="btn-more" title="More" aria-label="More actions">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+        </button>
+      </header>
+
+      <div id="main">
+        <!-- Activity bar + side panel -->
+        <aside id="sidebar">
+          <nav id="activitybar">
+            <button class="act active" data-view="explorer" title="Explorer">
+              <svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M14 3v6h6" /></svg>
+            </button>
+            <button class="act" data-view="search" title="Search">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            </button>
+            <button class="act" data-view="packages" title="Packages">
+              <svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z" /><path d="m3 8 9 5 9-5M12 13v8" /></svg>
+            </button>
+            <div class="spacer"></div>
+            <button class="act" data-view="settings" title="Settings">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
+            </button>
+          </nav>
+          <section id="sidepanel">
+            <!-- Explorer -->
+            <div class="view" id="view-explorer">
+              <div class="view-head">
+                <span>EXPLORER</span>
+                <div class="view-actions">
+                  <button class="mini" id="btn-new-file" title="New file">
+                    <svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" /><path d="M12 12v6M9 15h6" /></svg>
+                  </button>
+                  <button class="mini" id="btn-new-folder" title="New folder">
+                    <svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M12 11v5M9.5 13.5h5" /></svg>
+                  </button>
+                  <button class="mini" id="btn-import" title="Import file from phone">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5" /><path d="M5 21h14" /></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="project-name">MY-PROJECT</div>
+              <div id="tree" role="tree"></div>
+              <input type="file" id="file-import" multiple hidden />
+            </div>
+            <!-- Search -->
+            <div class="view" id="view-search" hidden>
+              <div class="view-head"><span>SEARCH</span></div>
+              <div class="pad">
+                <input id="search-input" class="field" placeholder="Search in all files" autocomplete="off" />
+                <div id="search-results"></div>
+              </div>
+            </div>
+            <!-- Packages -->
+            <div class="view" id="view-packages" hidden>
+              <div class="view-head"><span>PACKAGES (pip)</span></div>
+              <div class="pad">
+                <div class="row">
+                  <input id="pkg-input" class="field" placeholder="e.g. numpy, requests, rich" autocomplete="off" />
+                  <button class="btn" id="pkg-install">Install</button>
+                </div>
+                <p class="hint">Installs with micropip. Needs internet. Pure-Python packages from PyPI work, plus Pyodide builds of numpy, pandas, matplotlib, scipy and more. Packages you import are also loaded automatically when you run.</p>
+                <div class="subhead">INSTALLED</div>
+                <div id="pkg-list"></div>
+              </div>
+            </div>
+            <!-- Settings -->
+            <div class="view" id="view-settings" hidden>
+              <div class="view-head"><span>SETTINGS</span></div>
+              <div class="pad settings">
+                <label>Theme
+                  <select id="set-theme" class="field">
+                    <option value="madara-dark">Madara Dark (cyan neon)</option>
+                    <option value="vs-dark">Dark Modern</option>
+                    <option value="vs">Light</option>
+                    <option value="hc-black">High Contrast</option>
+                  </select>
+                </label>
+                <label>Font size <span id="set-font-val"></span>
+                  <input type="range" id="set-font" min="10" max="24" step="1" />
+                </label>
+                <label>Tab size
+                  <select id="set-tab" class="field"><option>2</option><option>4</option><option>8</option></select>
+                </label>
+                <label class="check"><input type="checkbox" id="set-wrap" /> Word wrap</label>
+                <label class="check"><input type="checkbox" id="set-minimap" /> Minimap</label>
+                <label class="check"><input type="checkbox" id="set-keys" /> Coding key bar (Tab, brackets, symbols)</label>
+                <label class="check"><input type="checkbox" id="set-clear" /> Clear terminal before each run</label>
+                <label class="check"><input type="checkbox" id="set-lint" /> Live syntax check</label>
+                <div class="about">
+                  <div class="about-title">⟁ Madara PyIDE</div>
+                  <div id="about-versions">Loading Python…</div>
+                  <div>Editor: Monaco (the VS Code editor). Python: Pyodide (CPython on WebAssembly), runs fully offline.</div>
+                  <button class="btn danger" id="btn-reset">Reset workspace</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </aside>
+        <div id="scrim"></div>
+
+        <!-- Editor + panel -->
+        <section id="workbench">
+          <div id="tabs" role="tablist"></div>
+          <div id="editor-wrap">
+            <div id="editor"></div>
+            <div id="empty-state" hidden>
+              <div class="logo-big">⟁</div>
+              <p>No file open</p>
+              <button class="btn" id="btn-empty-new">New Python file</button>
+            </div>
+          </div>
+          <div id="keybar"></div>
+          <div id="panel">
+            <div id="panel-resizer"><span></span></div>
+            <div id="panel-head">
+              <span class="ptab active">TERMINAL</span>
+              <span id="run-state"></span>
+              <div class="spacer"></div>
+              <button class="mini" id="btn-clear" title="Clear terminal">
+                <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" /></svg>
+              </button>
+              <button class="mini" id="btn-panel-max" title="Maximize panel">
+                <svg viewBox="0 0 24 24"><path d="m6 15 6-6 6 6" /></svg>
+              </button>
+              <button class="mini" id="btn-panel-toggle" title="Hide panel">
+                <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
+              </button>
+            </div>
+            <div id="terminal" tabindex="0"></div>
+            <form id="term-input-row" autocomplete="off">
+              <span id="term-prompt">&gt;&gt;&gt;</span>
+              <input id="term-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="Python REPL — type code and press Enter" />
+              <button type="submit" class="mini" id="term-send" aria-label="Send">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </button>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <footer id="statusbar">
+        <span id="st-py"><i class="dot"></i><span>Python starting…</span></span>
+        <span id="st-err" hidden></span>
+        <div class="spacer"></div>
+        <span id="st-pos">Ln 1, Col 1</span>
+        <span id="st-lang">Python</span>
+      </footer>
+
+      <!-- Popup menu, dialogs, toast -->
+      <div id="menu" hidden></div>
+      <div id="dialog-backdrop" hidden>
+        <div id="dialog" role="dialog">
+          <div id="dialog-title"></div>
+          <div id="dialog-body"></div>
+          <input id="dialog-input" class="field" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <textarea id="dialog-textarea" class="field" rows="5" autocapitalize="off" spellcheck="false" hidden></textarea>
+          <div id="dialog-actions">
+            <button class="btn ghost" id="dialog-cancel">Cancel</button>
+            <button class="btn" id="dialog-ok">OK</button>
+          </div>
+        </div>
+      </div>
+      <div id="toast" hidden></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
